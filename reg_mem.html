@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<!--http://syaic12.cafe24.com/kimsuji/board/reg_member.html -->
+    <head>
+    <link rel = "stylesheet" href = "table.css">   
+    </head>
+  
+    <body>
+        <center>
+        <div><h1>회원가입</h1></div>
+        <form name = "reg" action = "reg_member.php" method = "post">
+            <table>
+                <tr>
+                    <th>아이디</th>
+                    <td><input type = "text" name = "userid" required></td>
+                </tr>
+                <tr>
+                    <th>비밀번호</th>
+                    <td><input type = "password" name = "passwd" required></td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td><input type = "text" name = "name" required></td>
+                </tr>
+                <tr>
+                    <th>email</th>
+                    <td><input type = "email" name = "email" required></td> 
+                </tr>
+                </table>
+ 
+                <div>
+                    <input type = "submit" class = "b2" value = "가입">
+                    <a href = "login.html"><input type = "button" class = "b2" value = "취소"></a>
+                </div>
+                
+        </center>
+        </form>       
+    </body>
+</html>
