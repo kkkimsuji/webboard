@@ -1,50 +1,74 @@
-<!DOCTYPE html>
-<html>
-<!--http://syaic12.cafe24.com/kimsuji/board/mod_form.php -->
-    <head>
-    <link rel = "stylesheet" href = "table.css">
-    </head>
+<?php
+session_start();
+include "db.php";
 
-    <body>
-        <center>
-        <div><h1>글수정</h1></div>
-        <?php
-         //DB 설정 파일 포함
-         include "db.php";
+// 1. 파라미터 체크 및 로그인 확인
+$idx = isset($_GET['idx']) ? (int)$_GET['idx'] : 0;
+$cp = isset($_GET['cp']) ? (int)$_GET['cp'] : 1;
+$ing_id = $_SESSION['userid'] ?? '';
+
+if (!$idx || !$ing_id) {
+    echo "<script>alert('잘못된 접근입니다.'); location.replace('board_list.php');</script>";
+    exit;
+}
+
+// 2. 해당 글 조회 및 권한 확인
+$sql = "SELECT * FROM sj_board WHERE idx = $idx";
+$res = mysqli_query($db, $sql);
+$row = mysqli_fetch_array($res);
+
+// 글이 없거나, 작성자와 로그인한 사용자가 다를 경우 차단
+if (!$row || $row['userid'] !== $ing_id) {
+    echo "<script>alert('본인의 글만 수정할 수 있습니다.'); history.back();</script>";
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>글 수정 - <?= htmlspecialchars($row['title']) ?></title>
+    <link rel="stylesheet" href="table.css">
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <header>
+            <h1>글 수정</h1>
+        </header>
+
+        <form name="mod" action="mod_proc.php" method="post">
+            <input type="hidden" name="idx" value="<?= $idx ?>">
+            <input type="hidden" name="cp" value="<?= $cp ?>">
         
-         // 보여줄 글의 idx
-         $idx = $_GET['idx'];
-         $cp = $_GET['cp'];
- 
-         // 테이블에서 해당 글 조회
-         $sql = "select * from sj_board
-                 where idx = $idx";
-         $res = mysqli_query($db, $sql);
- 
-         // 결과 얻기
-         $row = mysqli_fetch_array($res);
-        ?>
-        <form name = "mod" action = "mod_proc.php" method = "post">
-            <input type = "hidden" name = "idx" value = "<?=$idx?>">
-            <input type = "hidden" name = "cp" value = "<?=$cp?>">
-        
-            <table class = "t">
+            <table class="t" style="margin: 0 auto; width: 80%;">
                 <tr>
-                    <th>아이디</th>
-                    <td><input type = "text" name = "userid" class = "id" value = "<?=$row['userid']?>" readonly></td>  
+                    <th style="width: 20%;">아이디</th>
+                    <td>
+                        <input type="text" name="userid" class="id" 
+                               value="<?= htmlspecialchars($row['userid']) ?>" readonly style="background-color: #f0f0f0;">
+                    </td>  
                 </tr>
                 <tr>
                     <th>제목</th>
-                    <td><input type = "text" name = "title" style = "width:99%;"  value = "<?=$row['title']?>"></td>
+                    <td>
+                        <input type="text" name="title" style="width: 98%;" 
+                               value="<?= htmlspecialchars($row['title']) ?>" required>
+                    </td>
                 </tr>
                 <tr>
                     <th>내용</th>
-                    <td><textarea name = "content" cols = "50" rows = "20" style = "width: 99%;"><?=$row['content']?></textarea></td> 
+                    <td>
+                        <textarea name="content" rows="15" style="width: 98%;" required><?= htmlspecialchars($row['content']) ?></textarea>
+                    </td> 
                 </tr>
             </table>
-                <input type = "submit" class = "b2" value = "수정">
-                <a href = "javascript:history.go(-1);"><input type = "button" class = "b2" value = "취소"></a>
-        </center>
+
+            <div class="btn-group" style="margin-top: 20px;">
+                <button type="submit" class="b2">수정 완료</button>
+                <button type="button" class="b2" onclick="history.back();">취소</button>
+            </div>
         </form>
-    </body>
+    </div>
+</body>
 </html>
+<?php mysqli_close($db); ?>
