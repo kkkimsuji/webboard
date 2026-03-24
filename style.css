@@ -1,11 +1,75 @@
+/* 1. 폰트 및 라이브러리 임포트 */
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
-*{
-    font-family: 'Jua', 산세리프;  
+/* 2. 디자인 테마 (CSS 변수) - 색상을 한곳에서 관리하면 수정이 편해요 */
+:root {
+    --main-color: #BE5050;      /* 기존 rgb(190, 80, 80) */
+    --bg-color: #f9f9f9;
+    --table-border: #ddd;
+    --button-hover: #a34545;
 }
 
-h1{
-    color:rgb(190, 80, 80)
+/* 3. 기본 스타일 리셋 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-td{ text-align : center; }
+body {
+    font-family: 'Jua', sans-serif; /* '산세리프'를 'sans-serif'로 수정 */
+    background-color: var(--bg-color);
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 4. 레이아웃 (공통 컨테이너) */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+/* 5. 타이틀 스타일 */
+h1 {
+    color: var(--main-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 6. 테이블 공통 스타일 */
+td { 
+    text-align: center; 
+    padding: 10px;
+}
+
+/* 7. 버튼 스타일 (이전 PHP 파일들에서 쓴 클래스들) */
+.b1, .b2, .b3, button {
+    font-family: 'Jua', sans-serif;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--main-color);
+    color: white;
+    transition: background 0.3s;
+    margin: 5px;
+}
+
+.b1:hover, .b2:hover, .b3:hover, button:hover {
+    background-color: var(--button-hover);
+}
+
+/* 8. 기타 유틸리티 */
+a {
+    text-decoration: none;
+    color: var(--main-color);
+}
+
+a:hover {
+    text-decoration: underline;
+}
