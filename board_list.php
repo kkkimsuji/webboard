@@ -1,99 +1,105 @@
-<?php session_start();?>
+<?php
+session_start();
+include "db.php";
 
-<!--https://syaic12.cafe24.com/_myAdmin/index.php -->
-<!--http://syaic12.cafe24.com/kimsuji/board/board_list.php -->
-<!--완-->
+// 1. 페이징 설정 및 계산 (상단 로직 집중)
+$rows_per_page = 10;
+$cur_page = isset($_GET['cp']) ? (int)$_GET['cp'] : 1; // 숫자로 강제 형변환 (보안)
+if ($cur_page < 1) $cur_page = 1;
+
+// 전체 글 개수 조회
+$sql_count = "SELECT COUNT(*) FROM sj_board";
+$res_count = mysqli_query($db, $sql_count);
+$row_count = mysqli_fetch_array($res_count);
+$total_rows = $row_count[0];
+
+// 전체 페이지 수 계산
+$total_page = ceil($total_rows / $rows_per_page);
+if ($cur_page > $total_page && $total_page > 0) $cur_page = $total_page;
+
+// 현재 페이지의 시작 위치
+$start = ($cur_page - 1) * $rows_per_page;
+
+// 2. DB 데이터 가져오기
+$sql_list = "SELECT idx, userid, title, reg_date, hit 
+             FROM sj_board ORDER BY idx DESC LIMIT $start, $rows_per_page";
+$res_list = mysqli_query($db, $sql_list);
+?>
 <!DOCTYPE html>
-<html>
-    <head>
-    <link rel="stylesheet" href="table.css">
-    </head>
-    <body>
-        <?php
-        //DB 설정 파일 포함
-        include "db.php";
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>자유게시판</title>
+    <link rel="stylesheet" href="css/table.css">
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <header>
+            <h1>게시판</h1>
+            <p>접속자 : <strong><?= htmlspecialchars($_SESSION['userid'] ?? '비회원') ?></strong></p>
+        </header>
+
+        <nav class="menu-bar">
+            <a href="main.php"><button type="button" class="b3">MyPage👤</button></a>
+            <a href="write.php"><button type="button" class="b3">Write✍🏻</button></a>
+            <a href="logout.php"><button type="button" class="b3">Logout🔒</button></a>
+        </nav>
         
-        //전체 글 개수 조회
-        $sql = "select count(*) from sj_board";
-        $res = mysqli_query($db, $sql);
-        $row = mysqli_fetch_array($res);
-        $total_rows = $row[0];
-
-        //페이지 당 글의 수s
-        $rows_per_page = 10;
-
-        //전체 페이지 수
-        $total_page = ceil($total_rows/$rows_per_page);  //ceil: 올림
-        // 현재 페이지 얻기
-        $cur_page = $_GET['cp'];
-        if(!$cur_page) $cur_page = 1;
-        // 현재 페이지의 첫 글의 위치
-        $start = $rows_per_page * ($cur_page - 1);
-
-        // DB에 글 목록 조회
-        $sql = "select idx, userid, title, reg_date, hit 
-                from sj_board order by idx desc limit $start, $rows_per_page";
-        $res = mysqli_query($db, $sql);
-
-        // 결과 테이블의 행의 수 얻기
-        $num_rows = mysqli_num_rows($res);
-        ?>
-        <center>
-        <div><h1>게시판</h1></div>
-        <div>접속자 : <?=$_SESSION['userid']?></div>
-
-        <a href = "main.php"><input type = "button" class="b3" value = "MyPage👤"></a>
-        <a href = "write.php"><input type = "button" class="b3" value = "Write✍🏻"></a>
-        <a href = "logout.php"><input type = "button" class="b3" value = "Logout🔒"></a>
-        
-        <table  class="t">
-        <tr>
-            <th style="width: 10%"> 번호 </th>
-            <th style="width: 15%"> 작성자 </th> 
-            <th> 제목 </th> 
-            <th style="width: 25%"> 작성일 </th>
-            <th style="width: 10%"> 조회 </th>   
-        </tr>
-
-        <?php for ( $i = 0 ; $i < $num_rows ; $i++ ){
-            $row = mysqli_fetch_array($res);?>
-        <tr>
-            <td><?= $row['idx']?></td>
-            <td><?= $row['userid']?></td>
-            <td class="left">
-                <a href = "board_view.php?idx=<?=$row['idx']?>&cp=<?=$cur_page?>"><?= $row['title']?></a></td>
-            <td><?= $row['reg_date']?></td>
-            <td><?= $row['hit']?></td>
-        </tr>
-     
-        <?php } 
-            $prev = $cur_page - 1;
-            $next = $cur_page + 1; ?>
+        <table class="t">
+            <thead>
+                <tr>
+                    <th style="width: 10%">번호</th>
+                    <th style="width: 15%">작성자</th> 
+                    <th>제목</th> 
+                    <th style="width: 25%">작성일</th>
+                    <th style="width: 10%">조회</th>   
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = mysqli_fetch_array($res_list)): ?>
+                <tr>
+                    <td><?= $row['idx'] ?></td>
+                    <td><?= htmlspecialchars($row['userid']) ?></td>
+                    <td class="left">
+                        <a href="board_view.php?idx=<?= $row['idx'] ?>&cp=<?= $cur_page ?>">
+                            <?= htmlspecialchars($row['title']) ?>
+                        </a>
+                    </td>
+                    <td><?= $row['reg_date'] ?></td>
+                    <td><?= $row['hit'] ?></td>
+                </tr>
+                <?php endwhile; ?>
+                
+                <?php if (mysqli_num_rows($res_list) == 0): ?>
+                <tr>
+                    <td colspan="5">등록된 게시글이 없습니다.</td>
+                </tr>
+                <?php endif; ?>
+            </tbody>
         </table>
         
-        <div id="b">
-            <?php if($prev >0) {?>
-            <a href = "board_list.php?cp=<?=$prev?>"><?="<"?></a>
-            <?} 
-            for($j = 1; $j <= $total_page; $j++){
-                if ($j == $cp){?>
-                <span style="text-weight:bold"><?=$j?></span>
-                
-                <?}
-                else{ ?>
-                <a href="board_list.php?cp=<?=$j?>"><?=$j?></a>
-                <?php } 
-            }
-            if($next <= $total_page) {?>
-            <a href = "board_list.php?cp=<?=$next?>"><?=">"?></a>
-            <?} ?>
+        <div class="pagination">
+            <?php 
+            $prev = $cur_page - 1;
+            $next = $cur_page + 1;
+
+            if ($prev > 0): ?>
+                <a href="board_list.php?cp=<?= $prev ?>">&lt;</a>
+            <?php endif; ?>
+
+            <?php for ($j = 1; $j <= $total_page; $j++): ?>
+                <?php if ($j == $cur_page): ?>
+                    <span class="current-page" style="font-weight: bold; color: red;"><?= $j ?></span>
+                <?php else: ?>
+                    <a href="board_list.php?cp=<?= $j ?>"><?= $j ?></a>
+                <?php endif; ?>
+            <?php endfor; ?>
+
+            <?php if ($next <= $total_page): ?>
+                <a href="board_list.php?cp=<?= $next ?>">&gt;</a>
+            <?php endif; ?>
         </div>
-        </center>
-       
-        
-        <?php 
-        mysqli_close($db);
-        ?>
-        
-    </body>
+    </div>
+</body>
 </html>
+<?php mysqli_close($db); ?>
