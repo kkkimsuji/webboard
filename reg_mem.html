@@ -1,39 +1,50 @@
 <!DOCTYPE html>
-<html>
-<!--http://syaic12.cafe24.com/kimsuji/board/reg_member.html -->
-    <head>
-    <link rel = "stylesheet" href = "table.css">   
-    </head>
-  
-    <body>
-        <center>
-        <div><h1>회원가입</h1></div>
-        <form name = "reg" action = "reg_member.php" method = "post">
-            <table>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - 게시판 프로젝트</title>
+    <link rel="stylesheet" href="table.css">
+</head>
+<body>
+    <div class="container" style="text-align: center; margin-top: 50px;">
+        <header>
+            <h1>회원가입</h1>
+        </header>
+
+        <form name="reg" action="reg_member.php" method="post">
+            <table class="t" style="margin: 0 auto;">
                 <tr>
-                    <th>아이디</th>
-                    <td><input type = "text" name = "userid" required></td>
+                    <th><label for="userid">아이디</label></th>
+                    <td>
+                        <input type="text" id="userid" name="userid" placeholder="사용할 ID 입력" required autofocus>
+                    </td>
                 </tr>
                 <tr>
-                    <th>비밀번호</th>
-                    <td><input type = "password" name = "passwd" required></td>
+                    <th><label for="passwd">비밀번호</label></th>
+                    <td>
+                        <input type="password" id="passwd" name="passwd" placeholder="비밀번호 입력" required>
+                    </td>
                 </tr>
                 <tr>
-                    <th>이름</th>
-                    <td><input type = "text" name = "name" required></td>
+                    <th><label for="name">이름</label></th>
+                    <td>
+                        <input type="text" id="name" name="name" placeholder="실명 입력" required>
+                    </td>
                 </tr>
                 <tr>
-                    <th>email</th>
-                    <td><input type = "email" name = "email" required></td> 
+                    <th><label for="email">이메일</label></th>
+                    <td>
+                        <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+                    </td> 
                 </tr>
-                </table>
- 
-                <div>
-                    <input type = "submit" class = "b2" value = "가입">
-                    <a href = "login.html"><input type = "button" class = "b2" value = "취소"></a>
-                </div>
-                
-        </center>
-        </form>       
-    </body>
+            </table>
+
+            <div class="btn-group" style="margin-top: 20px;">
+                <button type="submit" class="b2">가입하기</button>
+                <button type="button" class="b2" onclick="location.href='login.html'">취소</button>
+            </div>
+        </form>
+    </div>
+</body>
 </html>
